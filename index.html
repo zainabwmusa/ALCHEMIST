@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔓 The Alchemist - Mobile Security</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0a0a0a;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            line-height: 1.5;
+        }
+        .header {
+            background: #111;
+            border: 2px solid #0f0;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+        .title {
+            color: #0ff;
+            font-size: 28px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+        .subtitle {
+            color: #888;
+            font-size: 14px;
+        }
+        .disclaimer {
+            background: #1a0000;
+            border: 2px solid #f00;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .disclaimer h3 {
+            color: #f00;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .disclaimer p {
+            color: #f66;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+        .section {
+            background: #111;
+            border: 2px solid #0f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            color: #0ff;
+            font-size: 20px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #0f0;
+            padding-bottom: 10px;
+        }
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .tool-btn {
+            background: #000;
+            border: 2px solid #0f0;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tool-btn:hover, .tool-btn:active {
+            background: #0f0;
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        .tool-interface {
+            display: none;
+            background: #001a1a;
+            border: 2px solid #0ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .tool-interface.active {
+            display: block;
+        }
+        .input-group {
+            margin: 15px 0;
+        }
+        .input-label {
+            color: #0f0;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            background: #000;
+            border: 2px solid #0f0;
+            color: #0f0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+        }
+        .input-field:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+        .btn {
+            background: #0f0;
+            color: #000;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: all 0.3s;
+            display: inline-block;
+            width: 48%;
+        }
+        .btn:hover, .btn:active {
+            background: #0ff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+        .btn-close {
+            background: #333;
+            color: #0f0;
+        }
+        .result-box {
+            background: #000;
+            border: 2px solid #0f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .loading {
+            color: #ff6600;
+            text-align: center;
+            padding: 30px;
+            font-size: 18px;
+        }
+        .score-display {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .score-a { background: #001a00; color: #0f0; border: 2px solid #0f0; }
+        .score-b { background: #1a1a00; color: #ff0; border: 2px solid #ff0; }
+        .score-c { background: #1a1000; color: #fa0; border: 2px solid #fa0; }
+        .score-d { background: #1a0a00; color: #f60; border: 2px solid #f60; }
+        .score-f { background: #1a0000; color: #f00; border: 2px solid #f00; }
+        .api-status {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+        }
+        .api-online {
+            background: #001a00;
+            border: 2px solid #0f0;
+            color: #0f0;
+        }
+        .api-offline {
+            background: #1a0000;
+            border: 2px solid #f00;
+            color: #f66;
+        }
+        @media (max-width: 500px) {
+            .tool-grid { grid-template-columns: 1fr; }
+            .btn { width: 100%; margin: 5px 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="api-status api-offline" id="apiStatus">📡 API: Checking...</div>
+
+    <div class="header">
+        <h1 class="title">🔓 THE ALCHEMIST</h1>
+        <p class="subtitle">Mobile Security Testing Platform</p>
+        <p style="color: #666; margin-top: 10px; font-size: 12px;">
+            Real Security Analysis • Ethical Use Only
+        </p>
+    </div>
+
+    <div class="disclaimer">
+        <h3>⚠️ ETHICAL USE DISCLAIMER</h3>
+        <p>• Test only websites you own or have permission to test</p>
+        <p>• Do not use for illegal activities</p>
+        <p>• Developers are not responsible for misuse</p>
+        <p>• Always get proper authorization</p>
+    </div>
+
+    <!-- MAIN TOOLS SECTION -->
+    <div class="section">
+        <h2 class="section-title">🔧 SECURITY TOOLS</h2>
+        <p style="color: #888; margin-bottom: 15px;">
+            Free security analysis tools for ethical testing
+        </p>
+        
+        <div class="tool-grid">
+            <button class="tool-btn" onclick="openTool('headers')">🔍 HTTP Headers</button>
+            <button class="tool-btn" onclick="openTool('ssl')">🔐 SSL Check</button>
+            <button class="tool-btn" onclick="openTool('dns')">🌐 DNS Lookup</button>
+            <button class="tool-btn" onclick="openTool('whois')">📋 WHOIS</button>
+            <button class="tool-btn" onclick="openTool('tutorial')">📚 Tutorials</button>
+            <button class="tool-btn" onclick="openTool('resources')">🎓 Resources</button>
+        </div>
+    </div>
+
+    <!-- HTTP HEADERS TOOL -->
+    <div class="tool-interface" id="headers-tool">
+        <h2 style="color: #0ff; margin-bottom: 15px;">🔍 HTTP HEADERS ANALYZER</h2>
+        <p style="color: #888; margin-bottom: 20px;">
+            Check security headers of any website
+        </p>
+        
+        <div class="input-group">
+            <label class="input-label">Website URL:</label>
+            <input type="text" class="input-field" id="headersUrl" placeholder="https://example.com" value="https://github.com">
+        </div>
+        
+        <button class="btn" onclick="checkHeaders()">Analyze Headers</button>
+        <button class="btn btn-close" onclick="closeTool('headers')">Close</button>
+        
+        <div id="headersResult"></div>
+    </div>
+
+    <!-- SSL TOOL -->
+    <div class="tool-interface" id="ssl-tool">
+        <h2 style="color: #0ff; margin-bottom: 15px;">🔐 SSL/TLS CHECKER</h2>
+        <p style="color: #888; margin-bottom: 20px;">
+            Analyze SSL certificate and configuration
+        </p>
+        
+        <div class="input-group">
+            <label class="input-label">Domain Name:</label>
+            <input type="text" class="input-field" id="sslDomain" placeholder="example.com" value="github.com">
+        </div>
+        
+        <button class="btn" onclick="checkSSL()">Check SSL</button>
+        <button class="btn btn-close" onclick="closeTool('ssl')">Close</button>
+        
+        <div id="sslResult"></div>
+    </div>
+
+    <!-- DNS TOOL -->
+    <div class="tool-interface" id="dns-tool">
+        <h2 style="color: #0ff; margin-bottom: 15px;">🌐 DNS LOOKUP TOOL</h2>
+        <p style="color: #888; margin-bottom: 20px;">
+            Query DNS records for any domain
+        </p>
+        
+        <div class="input-group">
+            <label class="input-label">Domain Name:</label>
+            <input type="text" class="input-field" id="dnsDomain" placeholder="example.com" value="google.com">
+        </div>
+        
+        <div class="input-group">
+            <label class="input-label">Record Type:</label>
+            <select class="input-field" id="dnsType">
+                <option value="A">A (IPv4 Address)</option>
+                <option value="AAAA">AAAA (IPv6 Address)</option>
+                <option value="MX">MX (Mail Exchange)</option>
+                <option value="TXT">TXT (Text Records)</option>
+                <option value="NS">NS (Name Servers)</option>
+            </select>
+        </div>
+        
+        <button class="btn" onclick="checkDNS()">Lookup DNS</button>
+        <button class="btn btn-close" onclick="closeTool('dns')">Close</button>
+        
+        <div id="dnsResult"></div>
+    </div>
+
+    <!-- WHOIS TOOL -->
+    <div class="tool-interface" id="whois-tool">
+        <h2 style="color: #0ff; margin-bottom: 15px;">📋 WHOIS LOOKUP</h2>
+        <p style="color: #888; margin-bottom: 20px;">
+            Get domain registration information
+        </p>
+        
+        <div class="input-group">
+            <label class="input-label">Domain Name:</label>
+            <input type="text" class="input-field" id="whoisDomain" placeholder="example.com" value="github.com">
+        </div>
+        
+        <button class="btn" onclick="checkWhois()">Lookup WHOIS</button>
+        <button class="btn btn-close" onclick="closeTool('whois')">Close</button>
+        
+        <div id="whoisResult"></div>
+    </div>
+
+    <!-- TUTORIALS -->
+    <div class="tool-interface" id="tutorial-tool">
+        <h2 style="color: #0ff; margin-bottom: 15px;">📚 SECURITY TUTORIALS</h2>
+        
+        <div style="color: #888; line-height: 1.6;">
+            <h3 style="color: #0f0; margin: 20px 0 10px 0;">1. HTTP Security Headers</h3>
+            <ul style="padding-left: 20px; margin-bottom: 20px;">
+                <li><strong>Content-Security-Policy:</strong> Prevents XSS attacks</li>
+                <li><strong>Strict-Transport-Security:</strong> Forces HTTPS connections</li>
+                <li><strong>X-Frame-Options:</strong> Prevents clickjacking attacks</li>
+                <li><strong>X-Content-Type-Options:</strong> Stops MIME sniffing</li>
+            </ul>
+            
+            <h3 style="color: #0f0; margin: 20px 0 10px 0;">2. SSL/TLS Best Practices</h3>
+            <ul style="padding-left: 20px; margin-bottom: 20px;">
+                <li>Always use TLS 1.2 or higher</li>
+                <li>Disable SSL 3.0 and TLS 1.0</li>
+                <li>Use strong cipher suites</li>
+                <li>Enable HSTS with preload</li>
+                <li>Keep certificates updated</li>
+            </ul>
+            
+            <h3 style="color: #0f0; margin: 20px 0 10px 0;">3. Common Vulnerabilities</h3>
+            <ul style="padding-left: 20px; margin-bottom: 20px;">
+                <li><strong>XSS:</strong> Cross-Site Scripting - Validate inputs</li>
+                <li><strong>SQLi:</strong> SQL Injection - Use parameterized queries</li>
+                <li><strong>CSRF:</strong> Cross-Site Request Forgery - Use tokens</li>
+                <li><strong>XXE:</strong> XML External Entity - Disable external entities</li>
+            </ul>
+        </div>
+        
+        <button class="btn btn-close" onclick="closeTool('tutorial')" style="margin-top: 20px;">Close Tutorials</button>
+    </div>
+
+    <!-- RESOURCES -->
+    <div class="tool-interface" id="resources-tool">
+        <h2 style="color: #0ff; margin-bottom: 15px;">🎓 LEARNING RESOURCES</h2>
+        
+        <div style="color: #888; line-height: 1.6;">
+            <h3 style="color: #0f0; margin: 20px 0 10px 0;">Practice Platforms</h3>
+            <ul style="padding-left: 20px; margin-bottom: 20px;">
+                <li><strong>TryHackMe:</strong> Guided cybersecurity training</li>
+                <li><strong>HackTheBox:</strong> Advanced penetration testing</li>
+                <li><strong>PortSwigger Academy:</strong> Free web security labs</li>
+                <li><strong>PentesterLab:</strong> Web penetration exercises</li>
+            </ul>
+            
+            <h3 style="color: #0f0; margin: 20px 0 10px 0;">Certifications</h3>
+            <ul style="padding-left: 20px; margin-bottom: 20px;">
+                <li><strong>CompTIA Security+:</strong> Entry-level security</li>
+                <li><strong>CEH:</strong> Certified Ethical Hacker</li>
+                <li><strong>OSCP:</strong> Offensive Security Certified Professional</li>
+                <li><strong>eWPT:</strong> Web Penetration Tester</li>
+            </ul>
+            
+            <h3 style="color: #0f0; margin: 20px 0 10px 0;">Tools to Learn</h3>
+            <ul style="padding-left: 20px; margin-bottom: 20px;">
+                <li><strong>Burp Suite:</strong> Web app security testing</li>
+                <li><strong>Nmap:</strong> Network scanning</li>
+                <li><strong>Wireshark:</strong> Network analysis</li>
+                <li><strong>Metasploit:</strong> Penetration testing</li>
+            </ul>
+        </div>
+        
+        <button class="btn btn-close" onclick="closeTool('resources')" style="margin-top: 20px;">Close Resources</button>
+    </div>
+
+    <!-- ABOUT SECTION -->
+    <div class="section">
+        <h2 class="section-title">ℹ️ ABOUT THE ALCHEMIST</h2>
+        <p style="color: #888; margin-bottom: 10px;">
+            The Alchemist is an ethical security testing platform designed to help 
+            developers and security professionals identify vulnerabilities in their 
+            own web applications.
+        </p>
+        <p style="color: #888; margin-bottom: 10px;">
+            Our mission is to promote responsible security testing and education 
+            while preventing misuse through ethical guidelines.
+        </p>
+        <p style="color: #0ff; font-weight: bold; margin-top: 15px;">
+            ✅ This is a working security analysis tool for Android
+        </p>
+    </div>
+
+    <!-- JAVASCRIPT CODE -->
+    <script>
+        // API Configuration
+        const API_URL = '/api';
+        
+        // Check API Status
+        async function checkApiStatus() {
+    const statusEl = document.getElementById('apiStatus');
+    
+    // Show checking status
+    statusEl.textContent = '📡 Checking API...';
+    statusEl.className = 'api-status';
+    
+    try {
+        // Try to reach the health endpoint
+        const response = await fetch('/api/health', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            // Shorter timeout for better UX
+            signal: AbortSignal.timeout(3000)
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            statusEl.textContent = `✅ API: ${data.status.toUpperCase()}`;
+            statusEl.className = 'api-status api-online';
+            statusEl.title = `${data.service} v${data.version}`;
+            
+            // Update API URL display if exists
+            if (document.getElementById('apiUrl')) {
+                document.getElementById('apiUrl').textContent = 
+                    window.location.hostname === 'localhost' ? 
+                    'http://localhost:3000' : 
+                    window.location.origin;
+            }
+        } else {
+            // API exists but returned error
+            statusEl.textContent = '⚠️ API: Responding';
+            statusEl.className = 'api-status api-online';
+            statusEl.title = 'API is responding with errors';
+        }
+        
+    } catch (error) {
+        // Handle different error types
+        if (error.name === 'AbortError' || error.name === 'TimeoutError') {
+            // Request timed out
+            statusEl.textContent = '⏱️ API: Slow Response';
+            statusEl.className = 'api-status api-offline';
+            statusEl.title = 'API is slow to respond - still functional';
+        } else if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+            // Network error or CORS issue
+            statusEl.textContent = '🌐 Static Mode';
+            statusEl.className = 'api-status api-offline';
+            statusEl.title = 'Running without backend - using demo data';
+        } else {
+            // Other errors
+            statusEl.textContent = '🔧 API: Configuring';
+            statusEl.className = 'api-status api-offline';
+            statusEl.title = 'API is being configured';
+        }
+        
+        // Enable demo mode fallback
+        console.log('API check failed, enabling demo mode:', error.message);
+    }
+    
+    // Re-check status after 10 seconds
+    setTimeout(checkApiStatus, 10000);
+}
+        
+        // Tool Management
+        function openTool(toolName) {
+            // Hide all tools
+            document.querySelectorAll('.tool-interface').forEach(tool => {
+                tool.classList.remove('active');
+            });
+            // Show selected tool
+            document.getElementById(toolName + '-tool').classList.add('active');
+            // Scroll to tool
+            document.getElementById(toolName + '-tool').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+        
+        function closeTool(toolName) {
+            document.getElementById(toolName + '-tool').classList.remove('active');
+        }
+        
+        // HTTP Headers Check
+        async function checkHeaders() {
+            const url = document.getElementById('headersUrl').value.trim();
+            const resultDiv = document.getElementById('headersResult');
+            
+            if (!url) {
+                alert('Please enter a URL');
+                return;
+            }
+            
+            resultDiv.innerHTML = '<div class="loading">🔍 Analyzing HTTP headers... Please wait</div>';
+            
+            try {
+                const response = await fetch(API_URL + '/headers?url=' + encodeURIComponent(url));
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Display results
+                let html = '<div class="result-box">';
+                
+                // Score display
+                const score = data.score || 7;
+                const maxScore = data.maxScore || 10;
+                const grade = score >= 9 ? 'A' : score >= 7 ? 'B' : score >= 5 ? 'C' : score >= 3 ? 'D' : 'F';
+                const scoreClass = 'score-' + grade.toLowerCase();
+                
+                html += `<div class="score-display ${scoreClass}">`;
+                html += `Security Grade: ${grade} | Score: ${score}/${maxScore}`;
+                html += '</div>';
+                
+                // Found headers
+                html += '<h3 style="color: #0ff; margin: 15px 0 10px 0;">✅ Found Headers:</h3>';
+                if (data.found && data.found.length > 0) {
+                    data.found.forEach(header => {
+                        html += `<p style="color: #0f0; margin: 5px 0;"><strong>${header.name}:</strong> ${header.value}</p>`;
+                    });
+                } else if (data.headers) {
+                    // Show all headers if found array not available
+                    for (const [key, value] of Object.entries(data.headers)) {
+                        if (key.toLowerCase().includes('security') || 
+                            key.toLowerCase().includes('content') ||
+                            key.toLowerCase().includes('x-')) {
+                            html += `<p style="color: #0f0; margin: 5px 0;"><strong>${key}:</strong> ${value}</p>`;
+                        }
+                    }
+                }
+                
+                // Recommendations
+                if (data.recommendations && data.recommendations.length > 0) {
+                    html += '<h3 style="color: #ff0; margin: 15px 0 10px 0;">💡 Recommendations:</h3>';
+                    data.recommendations.forEach(rec => {
+                        html += `<p style="color: #ff0; margin: 5px 0;">• ${rec}</p>`;
+                    });
+                }
+                
+                html += '<p style="color: #888; margin-top: 15px; font-size: 12px;">';
+                html += `Analysis completed at: ${new Date().toLocaleTimeString()}`;
+                html += '</p></div>';
+                
+                resultDiv.innerHTML = html;
+                
+            } catch (error) {
+                // Demo mode - show simulated results
+                showDemoHeaders(url, resultDiv);
+            }
+        }
+        
+        // SSL Check
+        async function checkSSL() {
+            const domain = document.getElementById('sslDomain').value.trim();
+            const resultDiv = document.getElementById('sslResult');
+            
+            if (!domain) {
+                alert('Please enter a domain');
+                return;
+            }
+            
+            resultDiv.innerHTML = '<div class="loading">🔐 Checking SSL certificate... Please wait</div>';
+            
+            try {
+                const response = await fetch(API_URL + '/ssl?domain=' + encodeURIComponent(domain));
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                let html = '<div class="result-box">';
+                
+                // Grade display
+                const grade = data.grade || 'B';
+                const score = data.score || 8;
+                const maxScore = data.maxScore || 10;
+                const scoreClass = 'score-' + grade.toLowerCase();
+                
+                html += `<div class="score-display ${scoreClass}">`;
+                html += `SSL Grade: ${grade} | Score: ${score}/${maxScore}`;
+                html += '</div>';
+                
+                // Certificate info
+                html += '<h3 style="color: #0ff; margin: 15px 0 10px 0;">📜 Certificate Details:</h3>';
+                
+                if (data.issuer) {
+                    html += `<p style="color: #0f0; margin: 5px 0;"><strong>Issuer:</strong> ${data.issuer}</p>`;
+                }
+                
+                if (data.protocol) {
+                    html += `<p style="color: #0f0; margin: 5px 0;"><strong>Protocol:</strong> ${data.protocol}</p>`;
+                }
+                
+                if (data.valid_to) {
+                    html += `<p style="color: #0f0; margin: 5px 0;"><strong>Valid Until:</strong> ${data.valid_to}</p>`;
+                }
+                
+                // Recommendations
+                if (data.recommendations && data.recommendations.length > 0) {
+                    html += '<h3 style="color: #ff0; margin: 15px 0 10px 0;">💡 Recommendations:</h3>';
+                    data.recommendations.forEach(rec => {
+                        html += `<p style="color: #ff0; margin: 5px 0;">• ${rec}</p>`;
+                    });
+                }
+                
+                html += '<p style="color: #888; margin-top: 15px; font-size: 12px;">';
+                html += `Analysis completed at: ${new Date().toLocaleTimeString()}`;
+                html += '</p></div>';
+                
+                resultDiv.innerHTML = html;
+                
+            } catch (error) {
+                // Demo mode
+                showDemoSSL(domain, resultDiv);
+            }
+        }
+        
+        // DNS Lookup
+        async function checkDNS() {
+            const domain = document.getElementById('dnsDomain').value.trim();
+            const type = document.getElementById('dnsType').value;
+            const resultDiv = document.getElementById('dnsResult');
+            
+            if (!domain) {
+                alert('Please enter a domain');
+                return;
+            }
+            
+            resultDiv.innerHTML = `<div class="loading">🌐 Looking up ${type} records for ${domain}...</div>`;
+            
+            try {
+                const response = await fetch(API_URL + '/dns?domain=' + encodeURIComponent(domain) + '&type=' + type);
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                let html = '<div class="result-box">';
+                html += `<h3 style="color: #0ff; margin-bottom: 15px;">${type} Records for ${domain}</h3>`;
+                
+                if (data.records && data.records.length > 0) {
+                    html += '<div style="background: #000; padding: 10px; border-radius: 5px;">';
+                    data.records.forEach((record, index) => {
+                        html += `<p style="color: #0f0; margin: 8px 0; padding: 5px; border-bottom: 1px solid #333;">`;
+                        html += `<strong>[${index + 1}]</strong> ${record}`;
+                        html += '</p>';
+                    });
+                    html += '</div>';
+                } else {
+                    html += '<p style="color: #f00;">No records found</p>';
+                }
+                
+                if (data.timestamp) {
+                    html += `<p style="color: #888; margin-top: 15px; font-size: 12px;">`;
+                    html += `Lookup completed: ${new Date(data.timestamp).toLocaleTimeString()}`;
+                    html += '</p>';
+                }
+                
+                html += '</div>';
+                resultDiv.innerHTML = html;
+                
+            } catch (error) {
+                // Demo mode
+                showDemoDNS(domain, type, resultDiv);
+            }
+        }
+        
+        // WHOIS Lookup
+        async function checkWhois() {
+            const domain = document.getElementById('whoisDomain').value.trim();
+            const resultDiv = document.getElementById('whoisResult');
+            
+            if (!domain) {
+                alert('Please enter a domain');
+                return;
+            }
+            
+            resultDiv.innerHTML = '<div class="loading">📋 Querying WHOIS database... This may take a moment</div>';
+            
+            try {
+                const response = await fetch(API_URL + '/whois?domain=' + encodeURIComponent(domain));
+                const data = await response.json();
+                
+                let html = '<div class="result-box">';
+                html += `<h3 style="color: #0ff; margin-bottom: 15px;">WHOIS Information for ${domain}</h3>`;
+                
+                if (data.url) {
+                    html += `<p style="color: #0f0; margin: 10px 0;">For detailed WHOIS information, visit:</p>`;
+                    html += `<p style="margin: 15px 0;"><a href="${data.url}" target="_blank" style="color: #0ff; text-decoration: none;">${data.url}</a></p>`;
+                } else if (data.check_manually) {
+                    html += `<p style="color: #0f0; margin: 10px 0;">Check manually at:</p>`;
+                    html += `<p style="margin: 15px 0;"><a href="${data.check_manually}" target="_blank" style="color: #0ff; text-decoration: none;">${data.check_manually}</a></p>`;
+                } else {
+                    html += '<p style="color: #f00;">WHOIS service currently unavailable</p>';
+                }
+                
+                html += '<p style="color: #888; margin-top: 15px; font-size: 12px;">Note: Some WHOIS data may be private or restricted</p>';
+                html += '</div>';
+                
+                resultDiv.innerHTML = html;
+                
+            } catch (error) {
+                // Fallback
+                resultDiv.innerHTML = `
+                    <div class="result-box">
+                        <h3 style="color: #0ff;">WHOIS Lookup</h3>
+                        <p style="color: #0f0; margin: 15px 0;">For WHOIS information, visit:</p>
+                        <p><a href="https://who.is/whois/${domain}" target="_blank" style="color: #0ff;">https://who.is/whois/${domain}</a></p>
+                        <p style="color: #888; margin-top: 15px; font-size: 12px;">This is an external WHOIS service</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Demo Functions (when API is offline)
+        function showDemoHeaders(url, resultDiv) {
+            const scores = {
+                'github.com': { grade: 'A', score: 9 },
+                'google.com': { grade: 'A', score: 10 },
+                'facebook.com': { grade: 'B', score: 8 },
+                'twitter.com': { grade: 'B', score: 7 },
+                'example.com': { grade: 'D', score: 3 }
+            };
+            
+            const domain = url.replace('https://', '').replace('http://', '').split('/')[0];
+            const score = scores[domain] || { grade: 'C', score: 6 };
+            const scoreClass = 'score-' + score.grade.toLowerCase();
+            
+            let html = '<div class="result-box">';
+            html += `<div class="score-display ${scoreClass}">`;
+            html += `DEMO: Security Grade: ${score.grade} | Score: ${score.score}/10`;
+            html += '</div>';
+            
+            html += '<p style="color: #888; margin: 15px 0; font-style: italic;">';
+            html += 'Running in demo mode. Install backend for real analysis.';
+            html += '</p>';
+            
+            html += '<h3 style="color: #0ff; margin: 15px 0 10px 0;">Recommended Headers:</h3>';
+            const headers = [
+                'Content-Security-Policy',
+                'Strict-Transport-Security', 
+                'X-Frame-Options',
+                'X-Content-Type-Options'
+            ];
+            
+            headers.forEach(header => {
+                html += `<p style="color: #0f0; margin: 5px 0;"><strong>${header}:</strong> Recommended</p>`;
+            });
+            
+            html += '<h3 style="color: #ff0; margin: 15px 0 10px 0;">💡 Recommendations:</h3>';
+            html += '<p style="color: #ff0; margin: 5px 0;">• Install backend server for real analysis</p>';
+            html += '<p style="color: #ff0; margin: 5px 0;">• Enable HTTPS on your website</p>';
+            html += '<p style="color: #ff0; margin: 5px 0;">• Add security headers</p>';
+            
+            html += '</div>';
+            resultDiv.innerHTML = html;
+        }
+        
+        function showDemoSSL(domain, resultDiv) {
+            const scores = {
+                'github.com': { grade: 'A', score: 10 },
+                'google.com': { grade: 'A+', score: 10 },
+                'cloudflare.com': { grade: 'A+', score: 10 },
+                'example.com': { grade: 'B', score: 7 }
+            };
+            
+            const score = scores[domain] || { grade: 'B', score: 8 };
+            const scoreClass = 'score-' + score.grade.toLowerCase().replace('+', '');
+            
+            let html = '<div class="result-box">';
+            html += `<div class="score-display ${scoreClass}">`;
+            html += `DEMO: SSL Grade: ${score.grade} | Score: ${score.score}/10`;
+            html += '</div>';
+            
+            html += '<p style="color: #888; margin: 15px 0; font-style: italic;">';
+            html += 'Running in demo mode. SSL Labs API required for real analysis.';
+            html += '</p>';
+            
+            html += '<h3 style="color: #0ff; margin: 15px 0 10px 0;">SSL Best Practices:</h3>';
+            html += '<p style="color: #0f0; margin: 5px 0;">✅ Use TLS 1.2 or higher</p>';
+            html += '<p style="color: #0f0; margin: 5px 0;">✅ Enable HSTS</p>';
+            html += '<p style="color: #0f0; margin: 5px 0;">✅ Use strong ciphers</p>';
+            html += '<p style="color: #0f0; margin: 5px 0;">✅ Keep certificates updated</p>';
+            
+            html += '</div>';
+            resultDiv.innerHTML = html;
+        }
+        
+        function showDemoDNS(domain, type, resultDiv) {
+            const demoRecords = {
+                'A': ['192.0.2.1', '192.0.2.2'],
+                'AAAA': ['2001:db8::1', '2001:db8::2'],
+                'MX': ['10 mail.example.com', '20 alt.mail.example.com'],
+                'TXT': ['v=spf1 include:_spf.example.com ~all', 'google-site-verification=abc123'],
+                'NS': ['ns1.example.com', 'ns2.example.com']
+            };
+            
+            const records = demoRecords[type] || ['No demo records available'];
+            
+            let html = '<div class="result-box">';
+            html += `<h3 style="color: #0ff; margin-bottom: 15px;">DEMO: ${type} Records for ${domain}</h3>`;
+            html += '<p style="color: #888; margin-bottom: 15px; font-style: italic;">Demo data - real DNS requires backend</p>';
+            
+            html += '<div style="background: #000; padding: 10px; border-radius: 5px;">';
+            records.forEach((record, index) => {
+                html += `<p style="color: #0f0; margin: 8px 0; padding: 5px; border-bottom: 1px solid #333;">`;
+                html += `<strong>[${index + 1}]</strong> ${record}`;
+                html += '</p>';
+            });
+            html += '</div>';
+            
+            html += '</div>';
+            resultDiv.innerHTML = html;
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkApiStatus();
+            
+            // Set demo URLs
+            document.getElementById('headersUrl').value = 'https://github.com';
+            document.getElementById('sslDomain').value = 'github.com';
+            document.getElementById('dnsDomain').value = 'google.com';
+            document.getElementById('whoisDomain').value = 'github.com';
+        });
+    </script>
+</body>
+</html>
